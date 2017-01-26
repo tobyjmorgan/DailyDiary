@@ -38,6 +38,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // Dispose of any resources that can be recreated.
     }
 
+    // Based on https://iosdevcenters.blogspot.com/2016/04/ordinal-dateformate-like-11th-21st-in.html
     func getPrettyDateString(date : Date) -> String{
 
         let calendar = Calendar.current
