@@ -1,27 +1,63 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16C68" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BG0-H7-FUX">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11106"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
-        <scene sceneID="EHf-IW-A2E">
+        <scene sceneID="0cH-kt-V6a">
             <objects>
-                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                <viewController id="BG0-H7-FUX" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="Llm-lL-Icb"/>
-                        <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
+                        <viewControllerLayoutGuide type="top" id="kz9-D6-uGw"/>
+                        <viewControllerLayoutGuide type="bottom" id="A8z-OE-jTb"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                    <view key="view" contentMode="scaleToFill" id="NsM-Ff-5zf">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash" translatesAutoresizingMaskIntoConstraints="NO" id="Shu-1M-eic">
+                                <rect key="frame" x="0.0" y="240" width="375" height="188"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Shu-1M-eic" secondAttribute="height" multiplier="2:1" id="qEg-BY-pAX"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dY6-BT-3VF">
+                                <rect key="frame" x="16" y="448" width="343" height="90"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="90" id="5Eq-wL-1Jb"/>
+                                </constraints>
+                                <string key="text">your pocket
+confidant</string>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="33"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="0.35152924060000001" green="0.63522571329999999" blue="0.75147259239999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="Shu-1M-eic" firstAttribute="leading" secondItem="NsM-Ff-5zf" secondAttribute="leading" id="7h7-xC-fc0"/>
+                            <constraint firstItem="dY6-BT-3VF" firstAttribute="trailing" secondItem="NsM-Ff-5zf" secondAttribute="trailingMargin" id="SJ1-1L-QTi"/>
+                            <constraint firstItem="dY6-BT-3VF" firstAttribute="leading" secondItem="NsM-Ff-5zf" secondAttribute="leadingMargin" id="UWx-sK-w3V"/>
+                            <constraint firstItem="Shu-1M-eic" firstAttribute="centerY" secondItem="NsM-Ff-5zf" secondAttribute="centerY" id="arZ-eN-5Sj"/>
+                            <constraint firstItem="dY6-BT-3VF" firstAttribute="top" secondItem="Shu-1M-eic" secondAttribute="bottom" constant="20" id="mPB-c7-OfP"/>
+                            <constraint firstAttribute="trailing" secondItem="Shu-1M-eic" secondAttribute="trailing" id="vhc-4t-Fg0"/>
+                        </constraints>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VyB-8D-sTy" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="-126" y="146"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="splash" width="375" height="200"/>
+    </resources>
 </document>
