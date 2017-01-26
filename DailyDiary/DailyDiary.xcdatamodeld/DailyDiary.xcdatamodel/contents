@@ -6,12 +6,6 @@
         <relationship name="location" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Location" inverseName="diaryEntry" inverseEntity="Location" syncable="YES"/>
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Photo" inverseName="diaryEntry" inverseEntity="Photo" syncable="YES"/>
     </entity>
-    <entity name="Event" representedClassName="Event" codeGenerationType="class">
-        <attribute name="timestamp" optional="YES" attributeType="Date">
-            <userInfo/>
-        </attribute>
-        <userInfo/>
-    </entity>
     <entity name="Location" representedClassName="Location" syncable="YES" codeGenerationType="class">
         <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
@@ -22,7 +16,6 @@
         <relationship name="diaryEntry" maxCount="1" deletionRule="Nullify" destinationEntity="DiaryEntry" inverseName="photos" inverseEntity="DiaryEntry" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Event" positionX="261" positionY="189" width="128" height="60"/>
         <element name="DiaryEntry" positionX="270" positionY="207" width="128" height="105"/>
         <element name="Photo" positionX="288" positionY="234" width="128" height="75"/>
         <element name="Location" positionX="306" positionY="261" width="128" height="90"/>

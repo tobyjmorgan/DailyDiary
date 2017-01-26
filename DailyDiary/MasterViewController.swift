@@ -26,6 +26,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             let controllers = split.viewControllers
             self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
+        
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 100
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -78,7 +81,10 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
              
         // If appropriate, configure the new managed object.
         newDiaryEntry.createDate = NSDate()
-        newDiaryEntry.diaryEntryText = ""
+        
+        
+//        newDiaryEntry.diaryEntryText = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog, then slipped and fell. The quick brown fox jumps over the lazy dog again."
+        newDiaryEntry.diaryEntryText = "The quick."
         
         // Save the context.
         do {
@@ -117,9 +123,16 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DiaryCell", for: indexPath) as! DiaryCell
+        
         let entry = self.fetchedResultsController.object(at: indexPath)
+        
         self.configureCell(cell, withEntry: entry)
+        
+        // ensure the cell's layout is updated
+        cell.layoutIfNeeded()
+
         return cell
     }
 
@@ -144,8 +157,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
 
-    func configureCell(_ cell: UITableViewCell, withEntry entry: DiaryEntry) {
-        cell.textLabel!.text = getPrettyDateString(date: entry.createDate as! Date)
+    func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
+        cell.headingLabel!.text = getPrettyDateString(date: entry.createDate as! Date)
+        cell.thoughtsLabel!.text = entry.diaryEntryText
     }
 
     // MARK: - Fetched results controller
@@ -206,7 +220,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             case .delete:
                 tableView.deleteRows(at: [indexPath!], with: .fade)
             case .update:
-                self.configureCell(tableView.cellForRow(at: indexPath!)!, withEntry: anObject as! DiaryEntry)
+                let cell = tableView.cellForRow(at: indexPath!) as! DiaryCell
+                self.configureCell(cell, withEntry: anObject as! DiaryEntry)
             case .move:
                 tableView.moveRow(at: indexPath!, to: newIndexPath!)
         }
