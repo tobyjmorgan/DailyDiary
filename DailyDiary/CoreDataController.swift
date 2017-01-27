@@ -9,6 +9,18 @@
 import Foundation
 import CoreData
 
+struct CoreDataError {
+    static let ErrorNotification = Notification.Name("CoreDataErrorNotification")
+    static let ErrorKey = "ErrorKey"
+
+    let message: String
+    let fatal: Bool
+    
+    func makeUserInfoDict() -> [String : Any] {
+        return [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: fatal)]
+    }
+}
+
 class CoreDataController: NSObject {
     
     // singleton instance
@@ -20,14 +32,6 @@ class CoreDataController: NSObject {
         super.init()
     }
 
-    struct CoreDataError {
-        let message: String
-        let fatal: Bool
-    }
-    
-    static let errorNotificationName = Notification.Name("CoreDataControllerErrorNotification")
-    static let errorNotificationError = "CoreDataControllerErrorNotificationError"
-    
     private lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
@@ -51,26 +55,26 @@ class CoreDataController: NSObject {
                 print(message)
                 
                 // post a notification for anyone listening for Core Data errors
-                let userInfo = [CoreDataController.errorNotificationError : CoreDataError(message: message, fatal: true)]
-                NotificationCenter.default.post(name: CoreDataController.errorNotificationName, object: self, userInfo: userInfo)
+                
+                let coreDataError = CoreDataError(message: message, fatal: true)
+                NotificationCenter.default.post(name: CoreDataError.ErrorNotification, object: self, userInfo: coreDataError.makeUserInfoDict())
             }
         })
+        
         return container
     }()
     
-    func context() -> NSManagedObjectContext {
-        return persistentContainer.viewContext
-    }
-    
+    lazy var managedObjectContext: NSManagedObjectContext = {
+        return self.persistentContainer.viewContext
+    }()
+
     func saveContext () {
         
-        let context = persistentContainer.viewContext
-        
-        if context.hasChanges {
+        if managedObjectContext.hasChanges {
             
             do {
                 
-                try context.save()
+                try managedObjectContext.save()
                 
             } catch {
                 
@@ -79,8 +83,8 @@ class CoreDataController: NSObject {
                 print(message)
                 
                 // post a notification for anyone interested in error messages for failed save requests
-                let userInfo = [CoreDataController.errorNotificationError : CoreDataError(message: message, fatal: false)]
-                NotificationCenter.default.post(name: CoreDataController.errorNotificationName, object: self, userInfo: userInfo)
+                let userInfo = [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: false)]
+                NotificationCenter.default.post(name: CoreDataError.ErrorNotification, object: self, userInfo: userInfo)
             }
         }
     }

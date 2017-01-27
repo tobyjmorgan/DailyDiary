@@ -32,7 +32,17 @@ class DetailViewController: UIViewController {
             thoughtsTextField.text = detail.diaryEntryText
         }
     }
-
+    
+    func applyViewValuesToManagedObject() {
+        if let detail = self.detailItem {
+            
+            if let newText = thoughtsTextField.text {
+                
+                detail.diaryEntryText =  newText
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -43,6 +53,13 @@ class DetailViewController: UIViewController {
         super.viewWillAppear(animated)
         
         self.configureView()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        applyViewValuesToManagedObject()
+        CoreDataController.sharedInstance.saveContext()
     }
     
     override func didReceiveMemoryWarning() {

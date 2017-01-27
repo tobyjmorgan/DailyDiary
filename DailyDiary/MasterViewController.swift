@@ -12,8 +12,8 @@ import CoreData
 class MasterViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
     var detailViewController: DetailViewController? = nil
-    var managedObjectContext: NSManagedObjectContext? = nil
 
+    let dataController = CoreDataController.sharedInstance
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +30,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100
         
-        NotificationCenter.default.addObserver(self, selector: #selector(MasterViewController.onCoreDataError(notification:)), name: CoreDataController.errorNotificationName, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(MasterViewController.onCoreDataError(notification:)), name: CoreDataError.ErrorNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -47,7 +47,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         guard self.isViewLoaded && (self.view.window != nil),
               let userInfo = notification.userInfo as? [String: Any],
-              let error = userInfo[CoreDataController.errorNotificationError] as? CoreDataController.CoreDataError else { return }
+              let error = userInfo[CoreDataError.ErrorKey] as? CoreDataError else { return }
         
         let alert = UIAlertController(title: "Core Data Error", message: error.message, preferredStyle: .alert)
         let action:UIAlertAction
@@ -99,16 +99,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
     
     func insertNewObject(_ sender: Any) {
-        let newDiaryEntry = DiaryEntry(context: CoreDataController.sharedInstance.context())
+        let newDiaryEntry = DiaryEntry(context: dataController.managedObjectContext)
              
-        // If appropriate, configure the new managed object.
         newDiaryEntry.createDate = NSDate()
+        newDiaryEntry.diaryEntryText = "What happened today?"
         
-        
-//        newDiaryEntry.diaryEntryText = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog, then slipped and fell. The quick brown fox jumps over the lazy dog again."
-        newDiaryEntry.diaryEntryText = "The quick."
-        
-        CoreDataController.sharedInstance.saveContext()
+        dataController.saveContext()
     }
 
     // MARK: - Segues
@@ -160,7 +156,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             let context = self.fetchedResultsController.managedObjectContext
             context.delete(self.fetchedResultsController.object(at: indexPath))
                 
-            CoreDataController.sharedInstance.saveContext()
+            dataController.saveContext()
         }
     }
 
@@ -188,7 +184,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataController.sharedInstance.context(), sectionNameKeyPath: nil, cacheName: "Master")
+        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.managedObjectContext, sectionNameKeyPath: nil, cacheName: "Master")
         aFetchedResultsController.delegate = self
         _fetchedResultsController = aFetchedResultsController
         
