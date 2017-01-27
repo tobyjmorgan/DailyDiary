@@ -29,6 +29,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(MasterViewController.onCoreDataError(notification:)), name: CoreDataController.errorNotificationName, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -41,6 +43,27 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // Dispose of any resources that can be recreated.
     }
 
+    func onCoreDataError(notification: Notification) {
+        
+        guard self.isViewLoaded && (self.view.window != nil),
+              let userInfo = notification.userInfo as? [String: Any],
+              let error = userInfo[CoreDataController.errorNotificationError] as? CoreDataController.CoreDataError else { return }
+        
+        let alert = UIAlertController(title: "Core Data Error", message: error.message, preferredStyle: .alert)
+        let action:UIAlertAction
+        
+        if error.fatal {
+            action = UIAlertAction(title: "OK", style: .default) {(action) in
+                fatalError()
+            }
+        } else {
+            action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        }
+        
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
+    
     // Based on https://iosdevcenters.blogspot.com/2016/04/ordinal-dateformate-like-11th-21st-in.html
     func getPrettyDateString(date : Date) -> String{
 
@@ -76,8 +99,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
     
     func insertNewObject(_ sender: Any) {
-        let context = self.fetchedResultsController.managedObjectContext
-        let newDiaryEntry = DiaryEntry(context: context)
+        let newDiaryEntry = DiaryEntry(context: CoreDataController.sharedInstance.context())
              
         // If appropriate, configure the new managed object.
         newDiaryEntry.createDate = NSDate()
@@ -86,15 +108,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 //        newDiaryEntry.diaryEntryText = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog, then slipped and fell. The quick brown fox jumps over the lazy dog again."
         newDiaryEntry.diaryEntryText = "The quick."
         
-        // Save the context.
-        do {
-            try context.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
+        CoreDataController.sharedInstance.saveContext()
     }
 
     // MARK: - Segues
@@ -146,14 +160,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             let context = self.fetchedResultsController.managedObjectContext
             context.delete(self.fetchedResultsController.object(at: indexPath))
                 
-            do {
-                try context.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nserror = error as NSError
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
+            CoreDataController.sharedInstance.saveContext()
         }
     }
 
@@ -161,7 +168,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         cell.headingLabel!.text = getPrettyDateString(date: entry.createDate as! Date)
         cell.thoughtsLabel!.text = entry.diaryEntryText
     }
-
+    
     // MARK: - Fetched results controller
 
     var fetchedResultsController: NSFetchedResultsController<DiaryEntry> {
@@ -181,7 +188,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataController.sharedInstance.persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: "Master")
+        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataController.sharedInstance.context(), sectionNameKeyPath: nil, cacheName: "Master")
         aFetchedResultsController.delegate = self
         _fetchedResultsController = aFetchedResultsController
         

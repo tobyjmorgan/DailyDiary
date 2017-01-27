@@ -20,15 +20,15 @@ class CoreDataController: NSObject {
         super.init()
     }
 
-    enum CoreDataError {
-        case fatal(message: String)
-        case notFatal(message: String)
+    struct CoreDataError {
+        let message: String
+        let fatal: Bool
     }
     
-    static let errorNotificationName = "CoreDataControllerErrorNotification"
+    static let errorNotificationName = Notification.Name("CoreDataControllerErrorNotification")
     static let errorNotificationError = "CoreDataControllerErrorNotificationError"
     
-    lazy var persistentContainer: NSPersistentContainer = {
+    private lazy var persistentContainer: NSPersistentContainer = {
         /*
          The persistent container for the application. This implementation
          creates and returns a container, having loaded the store for the
@@ -51,12 +51,16 @@ class CoreDataController: NSObject {
                 print(message)
                 
                 // post a notification for anyone listening for Core Data errors
-                let userInfo = [CoreDataController.errorNotificationError : CoreDataError.fatal(message: message)]
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: CoreDataController.errorNotificationName), object: self, userInfo: userInfo)
+                let userInfo = [CoreDataController.errorNotificationError : CoreDataError(message: message, fatal: true)]
+                NotificationCenter.default.post(name: CoreDataController.errorNotificationName, object: self, userInfo: userInfo)
             }
         })
         return container
     }()
+    
+    func context() -> NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
     
     func saveContext () {
         
@@ -75,8 +79,8 @@ class CoreDataController: NSObject {
                 print(message)
                 
                 // post a notification for anyone interested in error messages for failed save requests
-                let userInfo = [CoreDataController.errorNotificationError : CoreDataError.notFatal(message: message)]
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: CoreDataController.errorNotificationName), object: self, userInfo: userInfo)
+                let userInfo = [CoreDataController.errorNotificationError : CoreDataError(message: message, fatal: false)]
+                NotificationCenter.default.post(name: CoreDataController.errorNotificationName, object: self, userInfo: userInfo)
             }
         }
     }
