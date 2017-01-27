@@ -64,40 +64,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         present(alert, animated: true, completion: nil)
     }
     
-    // Based on https://iosdevcenters.blogspot.com/2016/04/ordinal-dateformate-like-11th-21st-in.html
-    func getPrettyDateString(date : Date) -> String{
-
-        let calendar = Calendar.current
-        let anchorComponents = calendar.dateComponents([.day, .month, .year], from: date)
-        
-        let formatter = DateFormatter()
-        
-        // get pretty month
-        formatter.dateFormat = "MMMM"
-        let prettyMonth = formatter.string(from: date)
-        
-        // get day of the week
-        formatter.dateFormat = "EEEE"
-        let dayOfTheWeek = formatter.string(from: date)
-        
-        // get day of the month
-        var day  = "\(anchorComponents.day!)"
-        
-        // determine the ordinal
-        switch (day) {
-        case "1" , "21" , "31":
-            day.append("st")
-        case "2" , "22":
-            day.append("nd")
-        case "3" ,"23":
-            day.append("rd")
-        default:
-            day.append("th")
-        }
-        
-        return dayOfTheWeek + " " + day + " " + prettyMonth
-    }
-    
     func insertNewObject(_ sender: Any) {
         let newDiaryEntry = DiaryEntry(context: dataController.managedObjectContext)
              
@@ -161,7 +127,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
-        cell.headingLabel!.text = getPrettyDateString(date: entry.createDate as! Date)
+        cell.headingLabel!.text = (entry.createDate as Date).prettyDateStringEEEE_NTH_MMMM
         cell.thoughtsLabel!.text = entry.diaryEntryText
     }
     

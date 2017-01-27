@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16C68" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="DiaryEntry" representedClassName="DiaryEntry" syncable="YES" codeGenerationType="class">
+    <entity name="DiaryEntry" representedClassName="DiaryEntry" syncable="YES">
         <attribute name="createDate" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="diaryEntryText" attributeType="String" syncable="YES"/>
+        <attribute name="moodInteger" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="location" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Location" inverseName="diaryEntry" inverseEntity="Location" syncable="YES"/>
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Photo" inverseName="diaryEntry" inverseEntity="Photo" syncable="YES"/>
     </entity>
-    <entity name="Location" representedClassName="Location" syncable="YES" codeGenerationType="class">
+    <entity name="Location" representedClassName="Location" syncable="YES">
         <attribute name="latitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="longitude" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="diaryEntry" maxCount="1" deletionRule="Nullify" destinationEntity="DiaryEntry" inverseName="location" inverseEntity="DiaryEntry" syncable="YES"/>
     </entity>
-    <entity name="Photo" representedClassName="Photo" syncable="YES" codeGenerationType="class">
+    <entity name="Photo" representedClassName="Photo" syncable="YES">
         <attribute name="image" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <relationship name="diaryEntry" maxCount="1" deletionRule="Nullify" destinationEntity="DiaryEntry" inverseName="photos" inverseEntity="DiaryEntry" syncable="YES"/>
     </entity>
     <elements>
-        <element name="DiaryEntry" positionX="270" positionY="207" width="128" height="105"/>
+        <element name="DiaryEntry" positionX="270" positionY="207" width="128" height="120"/>
         <element name="Photo" positionX="288" positionY="234" width="128" height="75"/>
         <element name="Location" positionX="306" positionY="261" width="128" height="90"/>
     </elements>

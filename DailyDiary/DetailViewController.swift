@@ -21,15 +21,14 @@ class DetailViewController: UIViewController {
 
     func configureView() {
         // Update the user interface for the detail item.
+        // unwrap the detail item
+        // then unwrap an outlet to see if they are ready for use, if not skip
         if let detail = self.detailItem,
             let _ = locationLabel {
             
-            if let date = detail.createDate as? Date {
-                
-                headingLabel.text = date.description
-            }
-
+            headingLabel.text = (detail.createDate as Date).prettyDateStringEEEE_NTH_MMMM
             thoughtsTextField.text = detail.diaryEntryText
+            moodImageView.image = detail.imageForMood
         }
     }
     
@@ -84,6 +83,14 @@ class DetailViewController: UIViewController {
     
     @IBAction func onMoodButton(_ sender: UIButton) {
         print("Mood button \(sender.tag) tapped...")
+        
+        if let newMood = Mood(rawValue: sender.tag) {
+            detailItem?.mood = newMood
+        } else {
+            detailItem?.mood = nil
+        }
+        
+        configureView()
     }
 }
 
