@@ -19,6 +19,13 @@ class DetailViewController: UIViewController {
     @IBOutlet var wordCountLabel: UILabel!
     @IBOutlet var locationLabel: UILabel!
 
+    var detailItem: DiaryEntry? {
+        didSet {
+            // Update the view.
+            self.configureView()
+        }
+    }
+    
     func configureView() {
         // Update the user interface for the detail item.
         // unwrap the detail item
@@ -29,6 +36,8 @@ class DetailViewController: UIViewController {
             headingLabel.text = (detail.createDate as Date).prettyDateStringEEEE_NTH_MMMM
             thoughtsTextField.text = detail.diaryEntryText
             moodImageView.image = detail.imageForMood
+            
+            refreshCharacterCount()
         }
     }
     
@@ -45,7 +54,15 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-    //    self.configureView()
+        
+        // for handling the character count
+        thoughtsTextField.delegate = self
+        
+        // add save button to navigation bar
+        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
+        self.navigationItem.rightBarButtonItem = saveButton
+        
+        // change view controller title to current date
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -57,8 +74,6 @@ class DetailViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        applyViewValuesToManagedObject()
-        CoreDataController.sharedInstance.saveContext()
     }
     
     override func didReceiveMemoryWarning() {
@@ -66,13 +81,15 @@ class DetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    var detailItem: DiaryEntry? {
-        didSet {
-            // Update the view.
-            self.configureView()
-        }
+    func saveChanges() {
+        applyViewValuesToManagedObject()
+        CoreDataController.sharedInstance.saveContext()
     }
-
+    
+    func refreshCharacterCount() {
+        wordCountLabel.text = "\(thoughtsTextField.text.characters.count)/200"
+    }
+    
     @IBAction func onAddLocation() {
         print("Add location....")
     }
@@ -90,7 +107,17 @@ class DetailViewController: UIViewController {
             detailItem?.mood = nil
         }
         
+        applyViewValuesToManagedObject()
         configureView()
     }
 }
 
+extension DetailViewController: UITextViewDelegate {
+    
+    func textViewDidChange(_ textView: UITextView) {
+        
+        if textView == thoughtsTextField {
+            refreshCharacterCount()
+        }
+    }
+}
