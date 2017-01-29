@@ -45,6 +45,7 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         self.navigationItem.rightBarButtonItem = saveButton
         
         // change view controller title to current date
+        self.title = Date().prettyDateStringMMMM_NTH_YYYY
         
         // round corners for image
         photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
@@ -77,6 +78,9 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         // unwrap the detail item
         // then unwrap an outlet to see if they are ready for use, if not skip
         guard let detail = self.detailItem, let _ = locationLabel else { return }
+        
+        // change view controller title to the diary entry date
+        self.title = (detail.createDate as Date).prettyDateStringMMMM_NTH_YYYY
         
         headingLabel.text = (detail.createDate as Date).prettyDateStringEEEE_NTH_MMMM
         thoughtsTextField.text = detail.diaryEntryText
@@ -167,6 +171,7 @@ extension DetailViewController: UITextViewDelegate {
 
 // MARK: MediaPickerManagerDelegate
 extension DetailViewController {
+    
     func mediaPickerManager(manager: MediaPickerManager, didFinishPickingImage image: UIImage) {
         
         guard let resizedImage = resizeImage(image: image, toWidth: 750),

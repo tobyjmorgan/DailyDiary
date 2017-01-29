@@ -43,4 +43,37 @@ extension Date {
         
         return dayOfTheWeek + " " + day + " " + prettyMonth
     }
+    
+    var prettyDateStringMMMM_NTH_YYYY: String {
+        
+        let calendar = Calendar.current
+        let anchorComponents = calendar.dateComponents([.day, .month, .year], from: self)
+        
+        let formatter = DateFormatter()
+        
+        // get pretty month
+        formatter.dateFormat = "MMMM"
+        let prettyMonth = formatter.string(from: self)
+        
+        // get day of the week
+        formatter.dateFormat = "YYYY"
+        let year = formatter.string(from: self)
+        
+        // get day of the month
+        var day  = "\(anchorComponents.day!)"
+        
+        // determine the ordinal
+        switch (day) {
+        case "1" , "21" , "31":
+            day.append("st")
+        case "2" , "22":
+            day.append("nd")
+        case "3" ,"23":
+            day.append("rd")
+        default:
+            day.append("th")
+        }
+        
+        return prettyMonth + " " + day + ", " + year
+    }
 }
