@@ -8,8 +8,7 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
-
+class DetailViewController: UIViewController, MediaPickerManagerDelegate {
 
     @IBOutlet var photoImageView: UIImageView!
     @IBOutlet var photoImageContainer: UIView!
@@ -19,6 +18,8 @@ class DetailViewController: UIViewController {
     @IBOutlet var wordCountLabel: UILabel!
     @IBOutlet var locationLabel: UILabel!
 
+    let dataController = CoreDataController.sharedInstance
+    
     var detailItem: DiaryEntry? {
         didSet {
             // Update the view.
@@ -26,30 +27,11 @@ class DetailViewController: UIViewController {
         }
     }
     
-    func configureView() {
-        // Update the user interface for the detail item.
-        // unwrap the detail item
-        // then unwrap an outlet to see if they are ready for use, if not skip
-        if let detail = self.detailItem,
-            let _ = locationLabel {
-            
-            headingLabel.text = (detail.createDate as Date).prettyDateStringEEEE_NTH_MMMM
-            thoughtsTextField.text = detail.diaryEntryText
-            moodImageView.image = detail.imageForMood
-            
-            refreshCharacterCount()
-        }
-    }
-    
-    func applyViewValuesToManagedObject() {
-        if let detail = self.detailItem {
-            
-            if let newText = thoughtsTextField.text {
-                
-                detail.diaryEntryText =  newText
-            }
-        }
-    }
+    lazy var mediaPickerManager: MediaPickerManager = {
+        let manager = MediaPickerManager(presentingViewController: self)
+        manager.delegate = self
+        return manager
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +45,9 @@ class DetailViewController: UIViewController {
         self.navigationItem.rightBarButtonItem = saveButton
         
         // change view controller title to current date
+        
+        // round corners for image
+        photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -81,21 +66,63 @@ class DetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    
+    
+    
+    // MARK: Helper Methods
+    
+    func configureView() {
+        // Update the user interface for the detail item.
+        
+        // unwrap the detail item
+        // then unwrap an outlet to see if they are ready for use, if not skip
+        guard let detail = self.detailItem, let _ = locationLabel else { return }
+        
+        headingLabel.text = (detail.createDate as Date).prettyDateStringEEEE_NTH_MMMM
+        thoughtsTextField.text = detail.diaryEntryText
+        moodImageView.image = detail.imageForMood
+        
+        refreshCharacterCount()
+        
+        if let photo = detailItem?.photos?.lastObject as? Photo, let image = UIImage(data: photo.image as Data) {
+            
+            photoImageView.image = image
+        }
+    }
+    
+    func applyViewValuesToManagedObject() {
+        if let detail = self.detailItem {
+            
+            if let newText = thoughtsTextField.text {
+                
+                detail.diaryEntryText =  newText
+            }
+        }
+    }
+    
     func saveChanges() {
         applyViewValuesToManagedObject()
-        CoreDataController.sharedInstance.saveContext()
+        dataController.saveContext()
     }
     
     func refreshCharacterCount() {
         wordCountLabel.text = "\(thoughtsTextField.text.characters.count)/200"
     }
+}
+
+
+
+
+// MARK: IBActions
+extension DetailViewController {
     
     @IBAction func onAddLocation() {
         print("Add location....")
     }
-
+    
     @IBAction func onTappedPhoto() {
         print("Tapped photo....")
+        mediaPickerManager.presentImagePickerController(animated: true)
     }
     
     @IBAction func onMoodButton(_ sender: UIButton) {
@@ -112,12 +139,68 @@ class DetailViewController: UIViewController {
     }
 }
 
+
+
+
+// MARK: UITextViewDelegate
 extension DetailViewController: UITextViewDelegate {
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        
+        if textView == thoughtsTextField {
+            // thanks to Mykola - http://stackoverflow.com/questions/2492247/limit-number-of-characters-in-uitextview
+            return textView.text.characters.count + (text.characters.count - range.length) <= 200
+        }
+        
+        return true
+    }
     
     func textViewDidChange(_ textView: UITextView) {
         
         if textView == thoughtsTextField {
             refreshCharacterCount()
         }
+    }
+}
+
+
+
+// MARK: MediaPickerManagerDelegate
+extension DetailViewController {
+    func mediaPickerManager(manager: MediaPickerManager, didFinishPickingImage image: UIImage) {
+        
+        guard let resizedImage = resizeImage(image: image, toWidth: 750),
+              let diaryEntry = detailItem,
+              let imageData = UIImagePNGRepresentation(resizedImage) else { return }
+        
+        // save new image to store
+        let photo: Photo
+        
+        if let existingPhoto = diaryEntry.photos?.firstObject as? Photo {
+            photo = existingPhoto
+        } else {
+            photo = Photo(entity: Photo.entity(), insertInto: dataController.managedObjectContext)
+            photo.diaryEntry = diaryEntry
+        }
+
+        photo.image = imageData as NSData
+        dataController.saveContext()
+        
+        configureView()
+    }
+    
+    func resizeImage(image: UIImage, toWidth: CGFloat) -> UIImage? {
+
+        let aspectRatio = image.size.height / image.size.width
+        
+        let newSize = CGSize(width: toWidth, height: toWidth*aspectRatio)
+        let newRect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+        
+        UIGraphicsBeginImageContext(newSize)
+        image.draw(in: newRect)
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext()
+        
+        return resizedImage
     }
 }

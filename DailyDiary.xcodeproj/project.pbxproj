@@ -37,6 +37,8 @@
 		6BCB87051E3BE8550028DADF /* Location+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB86F91E3BE8550028DADF /* Location+CoreDataProperties.swift */; };
 		6BCB87081E3BF6560028DADF /* Date+Pretty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB87071E3BF6560028DADF /* Date+Pretty.swift */; };
 		6BCB87091E3BF6560028DADF /* Date+Pretty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB87071E3BF6560028DADF /* Date+Pretty.swift */; };
+		6BEB252A1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */; };
+		6BEB252B1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +84,7 @@
 		6BCB86F81E3BE8550028DADF /* Location+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataClass.swift"; sourceTree = "<group>"; };
 		6BCB86F91E3BE8550028DADF /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		6BCB87071E3BF6560028DADF /* Date+Pretty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Pretty.swift"; sourceTree = "<group>"; };
+		6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPickerManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,6 +195,7 @@
 				6BCB86B71E3A49D10028DADF /* MasterViewController.swift */,
 				6BCB86B91E3A49D10028DADF /* DetailViewController.swift */,
 				6BCB86E81E3A4AE50028DADF /* CoreDataController.swift */,
+				6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -345,6 +349,7 @@
 				6BCB87021E3BE8550028DADF /* Location+CoreDataClass.swift in Sources */,
 				6BCB87081E3BF6560028DADF /* Date+Pretty.swift in Sources */,
 				6BCB86FE1E3BE8550028DADF /* Photo+CoreDataClass.swift in Sources */,
+				6BEB252A1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */,
 				6BCB86FA1E3BE8550028DADF /* DiaryEntry+CoreDataClass.swift in Sources */,
 				6BCB86B31E3A49D10028DADF /* AppDelegate.swift in Sources */,
 				6BCB87041E3BE8550028DADF /* Location+CoreDataProperties.swift in Sources */,
@@ -363,6 +368,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BEB252B1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */,
 				6BCB86FD1E3BE8550028DADF /* DiaryEntry+CoreDataProperties.swift in Sources */,
 				6BCB86FF1E3BE8550028DADF /* Photo+CoreDataClass.swift in Sources */,
 				6BCB86F01E3A737C0028DADF /* DiaryCell.swift in Sources */,
@@ -619,6 +625,7 @@
 				6BCB86DE1E3A49D10028DADF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6BCB86DF1E3A49D10028DADF /* Build configuration list for PBXNativeTarget "DailyDiaryTests" */ = {
 			isa = XCConfigurationList;
@@ -627,6 +634,7 @@
 				6BCB86E11E3A49D10028DADF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6BCB86E21E3A49D10028DADF /* Build configuration list for PBXNativeTarget "DailyDiaryUITests" */ = {
 			isa = XCConfigurationList;
@@ -635,6 +643,7 @@
 				6BCB86E41E3A49D10028DADF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

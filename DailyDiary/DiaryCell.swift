@@ -43,8 +43,6 @@ class DiaryCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        // mood image should initially be hidden
-        moodImageView.isHidden = true
         mainImageContainer.layer.cornerRadius = mainImageContainer.frame.size.width/2
     }
 
@@ -52,5 +50,12 @@ class DiaryCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+    }
+    
+    func resetCell() {        
+        mainImageView.image = UIImage(named: "icn_noimage")
+        moodImageView.image = UIImage()
+        headingLabel.text = ""
+        thoughtsLabel.text = ""
     }
 }

@@ -102,6 +102,8 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "DiaryCell", for: indexPath) as! DiaryCell
         
+        cell.resetCell()
+        
         let entry = self.fetchedResultsController.object(at: indexPath)
         
         self.configureCell(cell, withEntry: entry)
@@ -129,6 +131,12 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
         cell.headingLabel!.text = (entry.createDate as Date).prettyDateStringEEEE_NTH_MMMM
         cell.thoughtsLabel!.text = entry.diaryEntryText
+        cell.moodImageView.image = entry.imageForMood
+
+        if let photo = entry.photos?.lastObject as? Photo, let image = UIImage(data: photo.image as Data) {
+            cell.mainImageView.image = image
+        }
+
     }
     
     // MARK: - Fetched results controller
