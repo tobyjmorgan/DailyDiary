@@ -47,8 +47,8 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         thoughtsTextField.delegate = self
         
         // add save button to navigation bar
-        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
-        self.navigationItem.rightBarButtonItem = saveButton
+//        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
+//        self.navigationItem.rightBarButtonItem = saveButton
         
         // change view controller title to current date
         self.title = Date().prettyDateStringMMMM_NTH_YYYY
@@ -70,6 +70,7 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+        saveChanges()
     }
     
     override func didReceiveMemoryWarning() {
