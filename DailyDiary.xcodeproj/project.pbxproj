@@ -39,6 +39,10 @@
 		6BCB87091E3BF6560028DADF /* Date+Pretty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB87071E3BF6560028DADF /* Date+Pretty.swift */; };
 		6BEB252A1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */; };
 		6BEB252B1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */; };
+		6BEB252D1E3E99BC00975C5E /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB252C1E3E99BC00975C5E /* LocationManager.swift */; };
+		6BEB252E1E3E99BC00975C5E /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB252C1E3E99BC00975C5E /* LocationManager.swift */; };
+		6BEB25301E3EFA2000975C5E /* UIViewController+CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB252F1E3EFA2000975C5E /* UIViewController+CoreDataError.swift */; };
+		6BEB25311E3EFA2000975C5E /* UIViewController+CoreDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEB252F1E3EFA2000975C5E /* UIViewController+CoreDataError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +89,8 @@
 		6BCB86F91E3BE8550028DADF /* Location+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Location+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		6BCB87071E3BF6560028DADF /* Date+Pretty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+Pretty.swift"; sourceTree = "<group>"; };
 		6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPickerManager.swift; sourceTree = "<group>"; };
+		6BEB252C1E3E99BC00975C5E /* LocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		6BEB252F1E3EFA2000975C5E /* UIViewController+CoreDataError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+CoreDataError.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +202,7 @@
 				6BCB86B91E3A49D10028DADF /* DetailViewController.swift */,
 				6BCB86E81E3A4AE50028DADF /* CoreDataController.swift */,
 				6BEB25291E3D1AE600975C5E /* MediaPickerManager.swift */,
+				6BEB252C1E3E99BC00975C5E /* LocationManager.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -204,6 +211,7 @@
 			isa = PBXGroup;
 			children = (
 				6BCB87071E3BF6560028DADF /* Date+Pretty.swift */,
+				6BEB252F1E3EFA2000975C5E /* UIViewController+CoreDataError.swift */,
 			);
 			name = Helper;
 			sourceTree = "<group>";
@@ -350,11 +358,13 @@
 				6BCB87081E3BF6560028DADF /* Date+Pretty.swift in Sources */,
 				6BCB86FE1E3BE8550028DADF /* Photo+CoreDataClass.swift in Sources */,
 				6BEB252A1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */,
+				6BEB252D1E3E99BC00975C5E /* LocationManager.swift in Sources */,
 				6BCB86FA1E3BE8550028DADF /* DiaryEntry+CoreDataClass.swift in Sources */,
 				6BCB86B31E3A49D10028DADF /* AppDelegate.swift in Sources */,
 				6BCB87041E3BE8550028DADF /* Location+CoreDataProperties.swift in Sources */,
 				6BCB86B61E3A49D10028DADF /* DailyDiary.xcdatamodeld in Sources */,
 				6BCB86E91E3A4AE50028DADF /* CoreDataController.swift in Sources */,
+				6BEB25301E3EFA2000975C5E /* UIViewController+CoreDataError.swift in Sources */,
 				6BCB86EF1E3A737C0028DADF /* DiaryCell.swift in Sources */,
 				6BCB86F21E3BE2430028DADF /* DiaryEntry+Mood.swift in Sources */,
 				6BCB86FC1E3BE8550028DADF /* DiaryEntry+CoreDataProperties.swift in Sources */,
@@ -368,6 +378,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6BEB25311E3EFA2000975C5E /* UIViewController+CoreDataError.swift in Sources */,
 				6BEB252B1E3D1AE600975C5E /* MediaPickerManager.swift in Sources */,
 				6BCB86FD1E3BE8550028DADF /* DiaryEntry+CoreDataProperties.swift in Sources */,
 				6BCB86FF1E3BE8550028DADF /* Photo+CoreDataClass.swift in Sources */,
@@ -380,6 +391,7 @@
 				6BCB87031E3BE8550028DADF /* Location+CoreDataClass.swift in Sources */,
 				6BCB87011E3BE8550028DADF /* Photo+CoreDataProperties.swift in Sources */,
 				6BCB86CD1E3A49D10028DADF /* DailyDiaryTests.swift in Sources */,
+				6BEB252E1E3E99BC00975C5E /* LocationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,7 +480,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -513,7 +525,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

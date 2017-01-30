@@ -20,6 +20,10 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
 
     let dataController = CoreDataController.sharedInstance
     
+    lazy var locationManager: LocationManager = {
+        return LocationManager(alertPresentingViewController: self)
+    }()
+    
     var detailItem: DiaryEntry? {
         didSet {
             // Update the view.
@@ -32,6 +36,8 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         manager.delegate = self
         return manager
     }()
+    
+    let placeHolderText = "What happened today?"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,12 +55,16 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         
         // round corners for image
         photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(MasterViewController.onCoreDataError(notification:)), name: CoreDataError.ErrorNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         self.configureView()
+        
+        determinePlaceholderTextForInactiveState()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -66,10 +76,11 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+}
+    
+    
+extension DetailViewController {
 
-    
-    
-    
     // MARK: Helper Methods
     
     func configureView() {
@@ -92,6 +103,19 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
             
             photoImageView.image = image
         }
+        
+        if let location = detailItem?.location {
+           
+            locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placemark, error) in
+                
+                if let placemark = placemark {
+                    
+                    guard let _ = placemark.name, let city = placemark.locality, let area = placemark.administrativeArea else { return }
+                    
+                    self.locationLabel.text = "\(city), \(area)"
+                }
+            }
+        }
     }
     
     func applyViewValuesToManagedObject() {
@@ -110,8 +134,42 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
     }
     
     func refreshCharacterCount() {
-        wordCountLabel.text = "\(thoughtsTextField.text.characters.count)/200"
+        if thoughtsTextField.text == placeHolderText {
+            
+            wordCountLabel.text = "0/200"
+
+        } else {
+            
+            wordCountLabel.text = "\(thoughtsTextField.text.characters.count)/200"
+        }
     }
+    
+    func determinePlaceholderTextForInactiveState() {
+        
+        if thoughtsTextField.text == "" {
+            
+            thoughtsTextField.text = placeHolderText
+            thoughtsTextField.textColor = UIColor.lightGray
+
+        } else if thoughtsTextField.text == placeHolderText {
+            
+            thoughtsTextField.textColor = UIColor.lightGray
+            
+        } else {
+            
+            thoughtsTextField.textColor = UIColor.darkGray
+        }
+    }
+    
+    func determinePlaceholderTextForActiveState() {
+        
+        if thoughtsTextField.text == placeHolderText {
+            thoughtsTextField.text = ""
+        }
+
+        thoughtsTextField.textColor = UIColor.darkGray
+    }
+
 }
 
 
@@ -121,7 +179,40 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
 extension DetailViewController {
     
     @IBAction func onAddLocation() {
+        
         print("Add location....")
+        
+        locationManager.getLocation { (latitude, longitude) in
+            
+            print("Location: \(latitude), \(longitude)")
+            
+            if let diaryEntry = self.detailItem {
+                
+                let location: Location
+            
+                if let existingLocation = diaryEntry.location {
+                    
+                    location = existingLocation
+                    
+                } else {
+                    
+                    location = Location(entity: Location.entity(), insertInto: self.dataController.managedObjectContext)
+                }
+                
+                location.diaryEntry = diaryEntry
+                location.latitude = latitude
+                location.longitude = longitude
+                
+                diaryEntry.location = location
+                
+                self.dataController.saveContext()
+
+                DispatchQueue.main.async {
+                    
+                    self.configureView()
+                }
+            }
+        }
     }
     
     @IBAction func onTappedPhoto() {
@@ -132,6 +223,7 @@ extension DetailViewController {
     @IBAction func onMoodButton(_ sender: UIButton) {
         print("Mood button \(sender.tag) tapped...")
         
+        // check the button tapped matches a valid Mood enumeration case
         if let newMood = Mood(rawValue: sender.tag) {
             detailItem?.mood = newMood
         } else {
@@ -151,6 +243,7 @@ extension DetailViewController: UITextViewDelegate {
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         
+        // limit length to 200 characters
         if textView == thoughtsTextField {
             // thanks to Mykola - http://stackoverflow.com/questions/2492247/limit-number-of-characters-in-uitextview
             return textView.text.characters.count + (text.characters.count - range.length) <= 200
@@ -159,8 +252,17 @@ extension DetailViewController: UITextViewDelegate {
         return true
     }
     
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        determinePlaceholderTextForActiveState()
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        determinePlaceholderTextForInactiveState()
+    }
+    
     func textViewDidChange(_ textView: UITextView) {
         
+        // when text view changes, recalculate character count
         if textView == thoughtsTextField {
             refreshCharacterCount()
         }
@@ -174,6 +276,8 @@ extension DetailViewController {
     
     func mediaPickerManager(manager: MediaPickerManager, didFinishPickingImage image: UIImage) {
         
+        // make sure we successfully resized the image, that we have a detail item to work with
+        // and the resized image could be converted to data
         guard let resizedImage = resizeImage(image: image, toWidth: 750),
               let diaryEntry = detailItem,
               let imageData = UIImagePNGRepresentation(resizedImage) else { return }
@@ -181,19 +285,32 @@ extension DetailViewController {
         // save new image to store
         let photo: Photo
         
+        // update the existing Photo object (DB allows one-to-many, but GUI best fits 1:1)
         if let existingPhoto = diaryEntry.photos?.firstObject as? Photo {
             photo = existingPhoto
         } else {
+            // create new Photo
             photo = Photo(entity: Photo.entity(), insertInto: dataController.managedObjectContext)
+            diaryEntry.addToPhotos(photo)
             photo.diaryEntry = diaryEntry
         }
 
+        // set the Photo's properties and save
         photo.image = imageData as NSData
         dataController.saveContext()
         
-        configureView()
+        // get back on the main queue
+        DispatchQueue.main.async {
+            
+            // update the GUI
+            self.configureView()
+            
+            // dismiss the picker
+            self.dismiss(animated: true, completion: nil)
+        }
     }
     
+    // method to resize image - reduce footprint
     func resizeImage(image: UIImage, toWidth: CGFloat) -> UIImage? {
 
         let aspectRatio = image.size.height / image.size.width

@@ -24,7 +24,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash" translatesAutoresizingMaskIntoConstraints="NO" id="Shu-1M-eic">
-                                <rect key="frame" x="0.0" y="240" width="375" height="188"/>
+                                <rect key="frame" x="0.0" y="240.5" width="375" height="187.5"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="Shu-1M-eic" secondAttribute="height" multiplier="2:1" id="qEg-BY-pAX"/>
                                 </constraints>
@@ -36,7 +36,7 @@
                                 </constraints>
                                 <string key="text">your pocket
 confidant</string>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="33"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="26"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>

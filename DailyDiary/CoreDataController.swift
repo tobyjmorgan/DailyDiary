@@ -51,6 +51,7 @@ class CoreDataController: NSObject {
                  Check the error message to determine what the actual problem was.
                  */
                 let nsError = error as NSError
+                
                 let message = "Failed set up persistent store: \(nsError.localizedDescription)"
                 print(message)
                 
@@ -81,6 +82,9 @@ class CoreDataController: NSObject {
                 let nsError = error as NSError
                 let message = "Failed to save changes: \(nsError.localizedDescription)"
                 print(message)
+                
+                let errorUserInfo = nsError.userInfo
+                print(errorUserInfo)
                 
                 // post a notification for anyone interested in error messages for failed save requests
                 let userInfo = [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: false)]
