@@ -75,13 +75,28 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "Photos" {
+
+            let backItem = UIBarButtonItem()
+            backItem.title = "Back"
+            navigationItem.backBarButtonItem = backItem
+            
+            if let controller = segue.destination as? PhotosViewController {
+                
+                controller.detailItem = detailItem
+            }
+        }
+    }
 }
     
     
+// MARK: Helper Methods
+
 extension DetailViewController {
 
-    // MARK: Helper Methods
-    
     func configureView() {
         // Update the user interface for the detail item.
         
@@ -211,7 +226,7 @@ extension DetailViewController {
     
     @IBAction func onTappedPhoto() {
         print("Tapped photo....")
-        mediaPickerManager.presentImagePickerController(animated: true)
+        //mediaPickerManager.presentImagePickerController(animated: true)
     }
     
     @IBAction func onMoodButton(_ sender: UIButton) {
@@ -272,7 +287,7 @@ extension DetailViewController {
         
         // make sure we successfully resized the image, that we have a detail item to work with
         // and the resized image could be converted to data
-        guard let resizedImage = resizeImage(image: image, toWidth: 750),
+        guard let resizedImage = MediaPickerManager.resizeImage(image: image, toWidth: 750),
               let diaryEntry = detailItem,
               let imageData = UIImagePNGRepresentation(resizedImage) else { return }
         
@@ -302,21 +317,5 @@ extension DetailViewController {
             // dismiss the picker
             self.dismiss(animated: true, completion: nil)
         }
-    }
-    
-    // method to resize image - reduce footprint
-    func resizeImage(image: UIImage, toWidth: CGFloat) -> UIImage? {
-
-        let aspectRatio = image.size.height / image.size.width
-        
-        let newSize = CGSize(width: toWidth, height: toWidth*aspectRatio)
-        let newRect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
-        
-        UIGraphicsBeginImageContext(newSize)
-        image.draw(in: newRect)
-        let resizedImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext()
-        
-        return resizedImage
     }
 }

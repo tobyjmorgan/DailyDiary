@@ -55,7 +55,7 @@ extension Date {
         formatter.dateFormat = "MMMM"
         let prettyMonth = formatter.string(from: self)
         
-        // get day of the week
+        // get year
         formatter.dateFormat = "YYYY"
         let year = formatter.string(from: self)
         
@@ -75,5 +75,20 @@ extension Date {
         }
         
         return prettyMonth + " " + day + ", " + year
+    }
+    
+    var prettyDateStringYYYYMM: String {
+        
+        let formatter = DateFormatter()
+        
+        // get pretty month
+        formatter.dateFormat = "MM"
+        let prettyMonth = formatter.string(from: self)
+        
+        // get year
+        formatter.dateFormat = "YYYY"
+        let year = formatter.string(from: self)
+        
+        return year + prettyMonth
     }
 }

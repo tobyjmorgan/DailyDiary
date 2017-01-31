@@ -25,9 +25,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         // change view controller title to current date
         self.title = Date().prettyDateStringMMMM_NTH_YYYY
 
-        // Do any additional setup after loading the view, typically from a nib.
-        self.navigationItem.leftBarButtonItem = self.editButtonItem
-
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
         self.navigationItem.rightBarButtonItem = addButton
         if let split = self.splitViewController {
@@ -58,6 +55,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         newDiaryEntry.diaryEntryText = "What happened today?"
         
         dataController.saveContext()
+        let indexPath = IndexPath(row: 0, section: 0)
+        tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
+        performSegue(withIdentifier: "showDetail", sender: self)
     }
 
     // MARK: - Segues
@@ -81,13 +81,30 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         }
     }
 
+    
+    
+    
     // MARK: - Table View
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return self.fetchedResultsController.sections?.count ?? 0
+        return fetchedResultsController.sections?.count ?? 0
     }
 
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        if let sections = fetchedResultsController.sections {
+            
+            let currentSection = sections[section]
+            let prettySectionName = DiaryEntry.prettySectionIdentifier(sectionIdentifier: currentSection.name)
+            
+            return prettySectionName
+        }
+        
+        return nil
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         let sectionInfo = self.fetchedResultsController.sections![section]
         return sectionInfo.numberOfObjects
     }
@@ -101,6 +118,9 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         let entry = self.fetchedResultsController.object(at: indexPath)
         
         self.configureCell(cell, withEntry: entry)
+        
+        // ensure the cell's layout is updated
+        cell.layoutIfNeeded()
         
         return cell
     }
@@ -130,10 +150,11 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
         if let location = entry.location {
             
+            cell.isLocationInfoShowing = true
+            
             locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placeName) in
                 
                 cell.locationTextLabel.text = placeName
-                cell.isLocationInfoShowing = true
             }
         }
     }
@@ -157,7 +178,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.managedObjectContext, sectionNameKeyPath: nil, cacheName: "Master")
+        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.managedObjectContext, sectionNameKeyPath: "sectionIdentifier", cacheName: "Master")
         aFetchedResultsController.delegate = self
         _fetchedResultsController = aFetchedResultsController
         

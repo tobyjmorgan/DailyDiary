@@ -44,6 +44,7 @@ class DiaryCell: UITableViewCell {
         super.awakeFromNib()
 
         mainImageContainer.layer.cornerRadius = mainImageContainer.frame.size.width/2
+        self.layoutIfNeeded()
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -57,5 +58,6 @@ class DiaryCell: UITableViewCell {
         moodImageView.image = UIImage()
         headingLabel.text = ""
         thoughtsLabel.text = ""
+        isLocationInfoShowing = false
     }
 }
