@@ -37,7 +37,7 @@ class LocationManager: NSObject {
             
         case .notDetermined:
             // ask for permission
-            manager.requestAlwaysAuthorization()
+            manager.requestWhenInUseAuthorization()
         
         case .authorizedWhenInUse:
             // yay - lets go!
@@ -64,12 +64,22 @@ class LocationManager: NSObject {
         }        
     }
     
-    func getPlacement(latitude: Double, longitude: Double, completion: @escaping (CLPlacemark?, Error?) -> Void) {
+    func getPlacement(latitude: Double, longitude: Double, completion: @escaping (String) -> Void) {
         
         let location = CLLocation(latitude: latitude, longitude: longitude)
         
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
-            completion(placemarks?.first, error)
+            
+            guard let placemark = placemarks?.first,
+                  let _ = placemark.name,
+                  let city = placemark.locality,
+                  let area = placemark.administrativeArea else {
+                    
+                    completion("Unable to get location")
+                    return
+            }
+            
+            completion("\(city), \(area)")
         }
     }
 }
@@ -80,7 +90,6 @@ extension LocationManager: CLLocationManagerDelegate {
         
         if status == .authorizedWhenInUse {
             manager.startUpdatingLocation()
-            //manager.requestLocation()
         }
     }
     

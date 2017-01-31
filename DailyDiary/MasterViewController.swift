@@ -15,8 +15,16 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     let dataController = CoreDataController.sharedInstance
 
+    lazy var locationManager: LocationManager = {
+        return LocationManager(alertPresentingViewController: self)
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // change view controller title to current date
+        self.title = Date().prettyDateStringMMMM_NTH_YYYY
+
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem
 
@@ -56,12 +64,19 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
+            let backItem = UIBarButtonItem()
+            backItem.title = "Back"
+            navigationItem.backBarButtonItem = backItem
+            
             if let indexPath = self.tableView.indexPathForSelectedRow {
             let object = self.fetchedResultsController.object(at: indexPath)
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
+                
+                // change view controller title to current date
+                controller.title = Date().prettyDateStringMMMM_NTH_YYYY
             }
         }
     }
@@ -87,9 +102,6 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         self.configureCell(cell, withEntry: entry)
         
-        // ensure the cell's layout is updated
-        cell.layoutIfNeeded()
-
         return cell
     }
 
@@ -116,8 +128,16 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             cell.mainImageView.image = image
         }
 
+        if let location = entry.location {
+            
+            locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placeName) in
+                
+                cell.locationTextLabel.text = placeName
+                cell.isLocationInfoShowing = true
+            }
+        }
     }
-    
+
     // MARK: - Fetched results controller
 
     var fetchedResultsController: NSFetchedResultsController<DiaryEntry> {

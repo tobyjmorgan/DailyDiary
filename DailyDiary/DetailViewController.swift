@@ -47,11 +47,9 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         thoughtsTextField.delegate = self
         
         // add save button to navigation bar
+// TJM - decided to remove this - better to save the entry on dismiss
 //        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
 //        self.navigationItem.rightBarButtonItem = saveButton
-        
-        // change view controller title to current date
-        self.title = Date().prettyDateStringMMMM_NTH_YYYY
         
         // round corners for image
         photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
@@ -107,14 +105,9 @@ extension DetailViewController {
         
         if let location = detailItem?.location {
            
-            locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placemark, error) in
-                
-                if let placemark = placemark {
+            locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placeName) in
                     
-                    guard let _ = placemark.name, let city = placemark.locality, let area = placemark.administrativeArea else { return }
-                    
-                    self.locationLabel.text = "\(city), \(area)"
-                }
+                self.locationLabel.text = placeName
             }
         }
     }

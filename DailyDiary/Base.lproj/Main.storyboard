@@ -579,7 +579,7 @@
                                             </constraints>
                                         </view>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="hxy-E1-Im8">
-                                            <rect key="frame" x="100" y="0.0" width="267" height="80"/>
+                                            <rect key="frame" x="100" y="0.0" width="267" height="99.5"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UuH-vc-s3W" userLabel="Top Spacer View">
                                                     <rect key="frame" x="0.0" y="0.0" width="267" height="10"/>
@@ -598,23 +598,20 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Record your thoughts for today" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1ny-rE-n0A">
-                                                    <rect key="frame" x="0.0" y="40" width="267" height="20"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="19.5" id="Khe-wU-R9t"/>
-                                                    </constraints>
+                                                    <rect key="frame" x="0.0" y="40" width="267" height="39.5"/>
                                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dLm-iB-bSz" userLabel="Location Spacer View">
-                                                    <rect key="frame" x="0.0" y="60" width="267" height="0.0"/>
+                                                    <rect key="frame" x="0.0" y="79.5" width="267" height="0.0"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" id="GBd-Y7-NcB"/>
                                                     </constraints>
                                                 </view>
                                                 <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dhI-fQ-XhP" userLabel="Location Container View">
-                                                    <rect key="frame" x="0.0" y="60" width="267" height="0.0"/>
+                                                    <rect key="frame" x="0.0" y="79.5" width="267" height="0.0"/>
                                                     <subviews>
                                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="0aH-ka-dFi">
                                                             <rect key="frame" x="0.0" y="0.0" width="267" height="0.0"/>
@@ -643,7 +640,7 @@
                                                     </constraints>
                                                 </view>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6cy-1F-4Qy" userLabel="Bottom Spacer View">
-                                                    <rect key="frame" x="0.0" y="60" width="267" height="20"/>
+                                                    <rect key="frame" x="0.0" y="79.5" width="267" height="20"/>
                                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="20" id="hGc-hb-f6Q"/>
