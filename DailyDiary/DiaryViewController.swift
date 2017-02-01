@@ -7,18 +7,28 @@
 //
 
 import UIKit
-import CoreData
 
 class DiaryViewController: UIViewController {
     
-    @IBOutlet var seachBar: UISearchBar!
+    @IBOutlet var searchBar: UISearchBar!
     @IBOutlet var tableView: UITableView!
     
     var detailViewController: DetailViewController? = nil
     
     let dataController = CoreDataController.sharedInstance
-
-    var _fetchedResultsController: NSFetchedResultsController<DiaryEntry>? = nil
+    
+    lazy var fetchedResultsManager: DiaryFetchedResultsManager = {
+        
+        let manager = DiaryFetchedResultsManager(managedObjectContext: self.dataController.managedObjectContext, tableView: self.tableView, onUpdateCell: {(cell, entry) in
+            
+            if let diaryCell = cell as? DiaryCell {
+                
+                self.configureCell(diaryCell, withEntry: entry)
+            }
+        })
+        
+        return manager
+    }()
     
     lazy var locationManager: LocationManager = {
         return LocationManager(alertPresentingViewController: self)
@@ -29,6 +39,8 @@ class DiaryViewController: UIViewController {
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        searchBar.delegate = self
         
         // change view controller title to current date
         self.title = Date().prettyDateStringMMMM_NTH_YYYY
@@ -47,6 +59,19 @@ class DiaryViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        if self.splitViewController!.isCollapsed {
+            
+            if let selections = tableView.indexPathsForSelectedRows {
+                
+                for selection in selections {
+                    tableView.deselectRow(at: selection, animated: true)
+                }
+            }
+        }
+        
+        tableView.reloadData()
+
 //        tableView.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
         super.viewWillAppear(animated)
     }
@@ -63,8 +88,8 @@ class DiaryViewController: UIViewController {
             backItem.title = "Back"
             navigationItem.backBarButtonItem = backItem
             
-            if let indexPath = self.tableView.indexPathForSelectedRow {
-                let object = self.fetchedResultsController.object(at: indexPath)
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let object = fetchedResultsManager.fetchedResultsController.object(at: indexPath)
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem
@@ -84,20 +109,28 @@ class DiaryViewController: UIViewController {
 extension DiaryViewController {
 
     func insertNewObject(_ sender: Any) {
+
+        // clear out any search text so the new row will appear
+        searchBar.text = ""
+        fetchedResultsManager.searchString = ""
         
+        // create new row
         let newDiaryEntry = DiaryEntry(context: dataController.managedObjectContext)
         
+        // set properties ans save
         newDiaryEntry.createDate = NSDate()
         newDiaryEntry.diaryEntryText = "What happened today?"
-        
         dataController.saveContext()
+        
+        // automatically go to detail view to edit details
         let indexPath = IndexPath(row: 0, section: 0)
         tableView.selectRow(at: indexPath, animated: false, scrollPosition: .top)
         performSegue(withIdentifier: "showDetail", sender: self)
     }
-
-    func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
     
+    // configure the cell to represent the information in the row
+    func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
+        
         cell.headingLabel!.text = (entry.createDate as Date).prettyDateStringEEEE_NTH_MMMM
         cell.thoughtsLabel!.text = entry.diaryEntryText
         cell.moodImageView.image = entry.imageForMood
@@ -116,8 +149,8 @@ extension DiaryViewController {
             }
         }
     }
-
 }
+
 
 
 
@@ -125,12 +158,11 @@ extension DiaryViewController {
 extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultsController.sections?.count ?? 0
+        return fetchedResultsManager.fetchedResultsController.sections?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        let sectionInfo = self.fetchedResultsController.sections![section]
+        let sectionInfo = fetchedResultsManager.fetchedResultsController.sections![section]
         return sectionInfo.numberOfObjects
     }
     
@@ -140,7 +172,7 @@ extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
         
         cell.resetCell()
         
-        let entry = self.fetchedResultsController.object(at: indexPath)
+        let entry = fetchedResultsManager.fetchedResultsController.object(at: indexPath)
         
         self.configureCell(cell, withEntry: entry)
         
@@ -152,7 +184,7 @@ extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         
-        if let sections = fetchedResultsController.sections {
+        if let sections = fetchedResultsManager.fetchedResultsController.sections {
             
             let currentSection = sections[section]
             let prettySectionName = DiaryEntry.prettySectionIdentifier(sectionIdentifier: currentSection.name)
@@ -171,8 +203,8 @@ extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let context = self.fetchedResultsController.managedObjectContext
-            context.delete(self.fetchedResultsController.object(at: indexPath))
+            let context = fetchedResultsManager.fetchedResultsController.managedObjectContext
+            context.delete(fetchedResultsManager.fetchedResultsController.object(at: indexPath))
             
             dataController.saveContext()
         }
@@ -182,96 +214,35 @@ extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
 
 
 
-// MARK: - Fetched results controller
-extension DiaryViewController: NSFetchedResultsControllerDelegate {
-    
-    var fetchedResultsController: NSFetchedResultsController<DiaryEntry> {
-        if _fetchedResultsController != nil {
-            return _fetchedResultsController!
-        }
-        
-        let fetchRequest: NSFetchRequest<DiaryEntry> = DiaryEntry.fetchRequest()
-        
-        // Set the batch size to a suitable number.
-        fetchRequest.fetchBatchSize = 20
-        
-        // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "createDate", ascending: false)
-        
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        // Edit the section name key path and cache name if appropriate.
-        // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.managedObjectContext, sectionNameKeyPath: "sectionIdentifier", cacheName: "Master")
-        aFetchedResultsController.delegate = self
-        _fetchedResultsController = aFetchedResultsController
-        
-        do {
-            try _fetchedResultsController!.performFetch()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        
-        return _fetchedResultsController!
-    }
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.beginUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        switch type {
-        case .insert:
-            self.tableView.insertSections(IndexSet(integer: sectionIndex), with: .fade)
-        case .delete:
-            self.tableView.deleteSections(IndexSet(integer: sectionIndex), with: .fade)
-        default:
-            return
-        }
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .fade)
-        case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .fade)
-        case .update:
-            let cell = tableView.cellForRow(at: indexPath!) as! DiaryCell
-            self.configureCell(cell, withEntry: anObject as! DiaryEntry)
-        case .move:
-            tableView.moveRow(at: indexPath!, to: newIndexPath!)
-        }
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.tableView.endUpdates()
-    }
-    
-    /*
-     // Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
-     
-     func controllerDidChangeContent(controller: NSFetchedResultsController) {
-     // In the simplest, most efficient, case, reload the table view.
-     self.tableView.reloadData()
-     }
-     */
-    
-    func changePredicate(searchString: String) {
-        
-    }
-}
-
+// MARK: UISearchBarDelegate
 extension DiaryViewController: UISearchBarDelegate {
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.characters.count > 0 {
-            
-            
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        if searchBar.isFirstResponder {
+            searchBar.resignFirstResponder()
+            searchBar.showsCancelButton = false
         }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        searchBar.showsCancelButton = true
+        
+        fetchedResultsManager.searchString = searchText
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        fetchedResultsManager.searchString = ""
+
+        searchBar.resignFirstResponder()
+        searchBar.showsCancelButton = false
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        searchBar.showsCancelButton = false
     }
 }
 

@@ -15,8 +15,8 @@ class LocationManager: NSObject {
     let manager = CLLocationManager()
     let geocoder = CLGeocoder()
    
+    // dependency injection for presenting alerts
     let alertPresentingViewController: UIViewController
-    var onLocationFix: ((Double, Double) -> Void)?
     
     init(alertPresentingViewController: UIViewController) {
         self.alertPresentingViewController = alertPresentingViewController
@@ -24,11 +24,17 @@ class LocationManager: NSObject {
         
         manager.delegate = self
     }
-    
+
+    // a closure for what to do when successfully geolocated
+    internal var onLocationFix: ((Double, Double) -> Void)?
+
+    // used when requesting current location
     func getLocation(completion: @escaping (Double, Double) -> Void) {
-        
+
+        // capture the completion handler for use later
         onLocationFix = completion
         
+        // what permissions do we have for using CLLocationManager?
         switch CLLocationManager.authorizationStatus() {
         
         case .authorizedAlways:
@@ -44,6 +50,7 @@ class LocationManager: NSObject {
             manager.startUpdatingLocation()
             
         case .restricted, .denied:
+            // present an alert showing how to change the settings if the user wants to
             let alertController = UIAlertController(
                 title: "Location Access Disabled",
                 message: "If you want to add your location to your diary entries, please open this app's settings and set location access to 'When In Use'.",
@@ -64,6 +71,7 @@ class LocationManager: NSObject {
         }        
     }
     
+    // used when requesting a location be converted in to placement
     func getPlacement(latitude: Double, longitude: Double, completion: @escaping (String) -> Void) {
         
         let location = CLLocation(latitude: latitude, longitude: longitude)
@@ -94,6 +102,8 @@ extension LocationManager: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        
+        // present alert with details of why geolocation failed
         let alertController = UIAlertController(
             title: "Location Error",
             message: "Unable to determine location: \(error).",
@@ -104,12 +114,14 @@ extension LocationManager: CLLocationManagerDelegate {
         alertPresentingViewController.present(alertController, animated: true, completion: nil)
     }
 
+    // found our location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         guard let location = locations.first else { return }
         
         if let onLocationFix = onLocationFix {
             
+            // call the closure for successful location 
             onLocationFix(location.coordinate.latitude, location.coordinate.longitude)
         }
         

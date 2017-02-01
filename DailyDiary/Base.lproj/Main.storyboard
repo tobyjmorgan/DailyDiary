@@ -652,7 +652,7 @@
                                         <constraints>
                                             <constraint firstAttribute="height" constant="44" id="x2T-lD-R3e"/>
                                         </constraints>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                     </searchBar>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="08b-0I-5tm">
                                         <rect key="frame" x="0.0" y="44" width="375" height="559"/>
@@ -815,7 +815,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="xMh-0S-Ueg"/>
                     <connections>
-                        <outlet property="seachBar" destination="nYB-EB-dmF" id="pMM-CM-UCj"/>
+                        <outlet property="searchBar" destination="nYB-EB-dmF" id="bUx-2D-0vP"/>
                         <outlet property="tableView" destination="08b-0I-5tm" id="ePC-bd-aHx"/>
                     </connections>
                 </viewController>
