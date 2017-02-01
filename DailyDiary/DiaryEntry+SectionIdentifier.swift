@@ -18,6 +18,8 @@ extension DiaryEntry {
     
     static func prettySectionIdentifier(sectionIdentifier: String) -> String {
     
+        guard sectionIdentifier.characters.count == 6 else { return "" }
+        
         var components = DateComponents()
         
         let index = sectionIdentifier.index(sectionIdentifier.startIndex, offsetBy: 4)
@@ -25,8 +27,7 @@ extension DiaryEntry {
         components.year = Int(sectionIdentifier.substring(to: index))
         components.month = Int(sectionIdentifier.substring(from: index))
         
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone(abbreviation: "CET")!
+        let calendar = Calendar.current
         
         let reconstructedDate = calendar.date(from: components)!
         
