@@ -17,8 +17,10 @@ class PhotosViewController: UIViewController {
         }
     }
     
+    // our core data singleton
     let dataController = CoreDataController.sharedInstance
     
+    // will handle camera and/or image picking
     lazy var mediaPickerManager: MediaPickerManager = {
         let manager = MediaPickerManager(presentingViewController: self)
         manager.delegate = self
@@ -47,22 +49,11 @@ class PhotosViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 }
 
 
 
-// MARK: IBOutlets
+// MARK: IBActions
 extension PhotosViewController {
     
     @IBAction func onTapPhoto() {

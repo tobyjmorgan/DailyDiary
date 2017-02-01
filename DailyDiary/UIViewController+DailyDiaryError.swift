@@ -1,5 +1,5 @@
 //
-//  UIViewController+CoreDataError.swift
+//  UIViewController+DailyDiaryError.swift
 //  DailyDiary
 //
 //  Created by redBred LLC on 1/29/17.
@@ -11,13 +11,13 @@ import UIKit
 
 extension UIViewController {
     
-    func onCoreDataError(notification: Notification) {
+    func onDailyDiaryError(notification: Notification) {
         
         guard self.isViewLoaded && (self.view.window != nil),
             let userInfo = notification.userInfo as? [String: Any],
-            let error = userInfo[CoreDataError.ErrorKey] as? CoreDataError else { return }
+            let error = userInfo[DailyDiaryError.ErrorKey] as? DailyDiaryError else { return }
         
-        let alert = UIAlertController(title: "Core Data Error", message: error.message, preferredStyle: .alert)
+        let alert = UIAlertController(title: error.title, message: error.message, preferredStyle: .alert)
         let action:UIAlertAction
         
         if error.fatal {

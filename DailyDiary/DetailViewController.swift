@@ -54,7 +54,7 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         // round corners for image
         photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
         
-        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onCoreDataError(notification:)), name: CoreDataError.ErrorNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onDailyDiaryError(notification:)), name: DailyDiaryError.ErrorNotification, object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {

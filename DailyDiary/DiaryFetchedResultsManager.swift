@@ -87,8 +87,8 @@ class DiaryFetchedResultsManager: NSObject, NSFetchedResultsControllerDelegate {
             print(errorUserInfo)
             
             // post a notification for anyone interested in error messages for failed save requests
-            let userInfo = [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: false)]
-            NotificationCenter.default.post(name: CoreDataError.ErrorNotification, object: self, userInfo: userInfo)
+            let fetchError = DailyDiaryError(title: "Fetched Results Error", message: message, fatal: false)
+            NotificationCenter.default.post(name: DailyDiaryError.ErrorNotification, object: self, userInfo: fetchError.makeUserInfoDict())
         }
         
         _fetchedResultsController = frc

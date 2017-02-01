@@ -9,18 +9,6 @@
 import Foundation
 import CoreData
 
-struct CoreDataError {
-    static let ErrorNotification = Notification.Name("CoreDataErrorNotification")
-    static let ErrorKey = "ErrorKey"
-
-    let message: String
-    let fatal: Bool
-    
-    func makeUserInfoDict() -> [String : Any] {
-        return [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: fatal)]
-    }
-}
-
 class CoreDataController: NSObject {
     
     // singleton instance
@@ -56,9 +44,8 @@ class CoreDataController: NSObject {
                 print(message)
                 
                 // post a notification for anyone listening for Core Data errors
-                
-                let coreDataError = CoreDataError(message: message, fatal: true)
-                NotificationCenter.default.post(name: CoreDataError.ErrorNotification, object: self, userInfo: coreDataError.makeUserInfoDict())
+                let coreDataError = DailyDiaryError(title: "Core Data Error", message: message, fatal: true)
+                NotificationCenter.default.post(name: DailyDiaryError.ErrorNotification, object: self, userInfo: coreDataError.makeUserInfoDict())
             }
         })
         
@@ -87,8 +74,8 @@ class CoreDataController: NSObject {
                 print(errorUserInfo)
                 
                 // post a notification for anyone interested in error messages for failed save requests
-                let userInfo = [CoreDataError.ErrorKey : CoreDataError(message: message, fatal: false)]
-                NotificationCenter.default.post(name: CoreDataError.ErrorNotification, object: self, userInfo: userInfo)
+                let coreDataError = DailyDiaryError(title: "Core Data Error", message: message, fatal: true)
+                NotificationCenter.default.post(name: DailyDiaryError.ErrorNotification, object: self, userInfo: coreDataError.makeUserInfoDict())
             }
         }
     }

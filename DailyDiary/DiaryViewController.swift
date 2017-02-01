@@ -15,8 +15,10 @@ class DiaryViewController: UIViewController {
     
     var detailViewController: DetailViewController? = nil
     
+    // our core data singleton
     let dataController = CoreDataController.sharedInstance
     
+    // will handle fetching core data results
     lazy var fetchedResultsManager: DiaryFetchedResultsManager = {
         
         let manager = DiaryFetchedResultsManager(managedObjectContext: self.dataController.managedObjectContext, tableView: self.tableView, onUpdateCell: {(cell, entry) in
@@ -30,6 +32,7 @@ class DiaryViewController: UIViewController {
         return manager
     }()
     
+    // will handle fetching location info
     lazy var locationManager: LocationManager = {
         return LocationManager(alertPresentingViewController: self)
     }()
@@ -52,10 +55,12 @@ class DiaryViewController: UIViewController {
             self.detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
         
+        // dynamically sized table view rows
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 100
         
-        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onCoreDataError(notification:)), name: CoreDataError.ErrorNotification, object: nil)
+        // listen for errors
+        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onDailyDiaryError(notification:)), name: DailyDiaryError.ErrorNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
