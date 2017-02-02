@@ -50,6 +50,9 @@ class MediaPickerManager: NSObject {
             alert.addAction(libraryAction)
             alert.addAction(cancelAction)
             
+            alert.popoverPresentationController?.sourceView = presentingViewController.view
+            alert.popoverPresentationController?.sourceRect = presentingViewController.view.bounds
+            
             presentingViewController.present(alert, animated: true, completion: nil)
             
         } else {

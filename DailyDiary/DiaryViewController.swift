@@ -77,6 +77,9 @@ class DiaryViewController: UIViewController {
         
         tableView.reloadData()
 
+        
+        displayWelcome()
+
 //        tableView.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
         super.viewWillAppear(animated)
     }
@@ -113,6 +116,26 @@ class DiaryViewController: UIViewController {
 // MARK: Helper methods
 extension DiaryViewController {
 
+    static let beenRunBeforeKey = "BeenRunBefore"
+
+    func displayWelcome() {
+        
+        let defaults = UserDefaults.standard
+        
+        let beenRunBefore = defaults.bool(forKey: DiaryViewController.beenRunBeforeKey)
+        
+        if !beenRunBefore {
+            
+            let alert = UIAlertController(title: "Welcome", message: "To add a diary entry for today, just click the Add button in the top right. Enjoy!", preferredStyle: .alert)
+            let action = UIAlertAction(title: "Will do!", style: .default, handler: nil)
+            alert.addAction(action)
+            present(alert, animated: true, completion: nil)
+            
+            defaults.set(true, forKey: DiaryViewController.beenRunBeforeKey)
+            defaults.synchronize()
+        }
+    }
+    
     func insertNewObject(_ sender: Any) {
 
         // clear out any search text so the new row will appear
@@ -163,7 +186,9 @@ extension DiaryViewController {
 extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultsManager.fetchedResultsController.sections?.count ?? 0
+        let sections = fetchedResultsManager.fetchedResultsController.sections?.count ?? 0
+        
+        return sections
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

@@ -14,10 +14,13 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
     @IBOutlet var photoImageContainer: UIView!
     @IBOutlet var moodImageView: UIImageView!
     @IBOutlet var headingLabel: UILabel!
-    @IBOutlet var thoughtsTextField: UITextView!
+    @IBOutlet var thoughtsTextField: LinedPaperTextView!
     @IBOutlet var wordCountLabel: UILabel!
     @IBOutlet var locationLabel: UILabel!
 
+    @IBOutlet var hiderView: UIView!
+    @IBOutlet var photosButton: UIButton!
+    
     let dataController = CoreDataController.sharedInstance
     
     lazy var locationManager: LocationManager = {
@@ -37,7 +40,7 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         return manager
     }()
     
-    let placeHolderText = "What happened today?"
+    static let placeHolderText = "What happened today?"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,15 +49,16 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         // for handling the character count
         thoughtsTextField.delegate = self
         
-        // add save button to navigation bar
-// TJM - decided to remove this - better to save the entry on dismiss
-//        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
-//        self.navigationItem.rightBarButtonItem = saveButton
+        hiderView.isHidden = false
+        
+        determineNeedForSaveButton()
         
         // round corners for image
         photoImageContainer.layer.cornerRadius = photoImageContainer.layer.frame.size.width / 2
+        photoImageContainer.layer.borderColor = UIColor.lightGray.cgColor
+        photoImageContainer.layer.borderWidth = 2.0
         
-        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onDailyDiaryError(notification:)), name: DailyDiaryError.ErrorNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(DetailViewController.onDailyDiaryError(notification:)), name: DailyDiaryError.ErrorNotification, object: nil)        
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -69,6 +73,12 @@ class DetailViewController: UIViewController, MediaPickerManagerDelegate {
         super.viewWillDisappear(animated)
         
         saveChanges()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        thoughtsTextField.setNeedsDisplay()
     }
     
     override func didReceiveMemoryWarning() {
@@ -116,6 +126,12 @@ extension DetailViewController {
         if let photo = detailItem?.photos?.lastObject as? Photo, let image = UIImage(data: photo.image as Data) {
             
             photoImageView.image = image
+            photosButton.setTitle("", for: .normal)
+
+        } else {
+            
+            photosButton.setTitle("Add Photos", for: .normal)
+            photosButton.titleLabel?.textAlignment = NSTextAlignment.center
         }
         
         if let location = detailItem?.location {
@@ -124,6 +140,11 @@ extension DetailViewController {
                     
                 self.locationLabel.text = placeName
             }
+        }
+
+        // show the detail if there is a detail item to view
+        if detailItem != nil {
+            hiderView.isHidden = true
         }
     }
     
@@ -143,10 +164,11 @@ extension DetailViewController {
     }
     
     func refreshCharacterCount() {
-        if thoughtsTextField.text == placeHolderText {
+        
+        if thoughtsTextField.text == DetailViewController.placeHolderText {
             
             wordCountLabel.text = "0/200"
-
+            
         } else {
             
             wordCountLabel.text = "\(thoughtsTextField.text.characters.count)/200"
@@ -157,10 +179,10 @@ extension DetailViewController {
         
         if thoughtsTextField.text == "" {
             
-            thoughtsTextField.text = placeHolderText
+            thoughtsTextField.text = DetailViewController.placeHolderText
             thoughtsTextField.textColor = UIColor.lightGray
 
-        } else if thoughtsTextField.text == placeHolderText {
+        } else if thoughtsTextField.text == DetailViewController.placeHolderText {
             
             thoughtsTextField.textColor = UIColor.lightGray
             
@@ -172,13 +194,25 @@ extension DetailViewController {
     
     func determinePlaceholderTextForActiveState() {
         
-        if thoughtsTextField.text == placeHolderText {
+        if thoughtsTextField.text == DetailViewController.placeHolderText {
             thoughtsTextField.text = ""
         }
 
         thoughtsTextField.textColor = UIColor.darkGray
     }
 
+    func determineNeedForSaveButton() {
+        
+        if !self.splitViewController!.isCollapsed {
+                
+            // showing both view controllers - which means no back button
+            // so we need a save button!
+            
+            // add save button to navigation bar
+            let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveChanges))
+            self.navigationItem.rightBarButtonItem = saveButton
+        }
+    }
 }
 
 
@@ -255,18 +289,28 @@ extension DetailViewController: UITextViewDelegate {
         // limit length to 200 characters
         if textView == thoughtsTextField {
             // thanks to Mykola - http://stackoverflow.com/questions/2492247/limit-number-of-characters-in-uitextview
-            return textView.text.characters.count + (text.characters.count - range.length) <= 200
+            let characterCount = textView.text.characters.count
+            let newTextCharacterCount = text.characters.count
+            let shouldProceed = characterCount + (newTextCharacterCount - range.length) <= 200
+            
+            return shouldProceed
         }
         
         return true
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        determinePlaceholderTextForActiveState()
+        
+        if textView == thoughtsTextField {
+            determinePlaceholderTextForActiveState()
+        }
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        determinePlaceholderTextForInactiveState()
+        
+        if textView == thoughtsTextField {
+            determinePlaceholderTextForInactiveState()
+        }
     }
     
     func textViewDidChange(_ textView: UITextView) {

@@ -77,17 +77,23 @@ class LocationManager: NSObject {
         let location = CLLocation(latitude: latitude, longitude: longitude)
         
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
-            
-            guard let placemark = placemarks?.first,
-                  let _ = placemark.name,
-                  let city = placemark.locality,
-                  let area = placemark.administrativeArea else {
-                    
-                    completion("Unable to get location")
-                    return
+
+            // make sure this happens on the main queue
+            // just in case there is any GUI code inside the completion handler
+            DispatchQueue.main.async {
+
+                guard let placemark = placemarks?.first,
+                    let _ = placemark.name,
+                    let city = placemark.locality,
+                    let area = placemark.administrativeArea else {
+                        
+                        completion("Unable to get location")
+                        return
+                }
+                
+                completion("\(city), \(area)")
             }
-            
-            completion("\(city), \(area)")
+
         }
     }
 }
@@ -121,8 +127,12 @@ extension LocationManager: CLLocationManagerDelegate {
         
         if let onLocationFix = onLocationFix {
             
-            // call the closure for successful location 
-            onLocationFix(location.coordinate.latitude, location.coordinate.longitude)
+            // make sure this happens on the main queue
+            // just in case there is any GUI code inside the onLocationFix completion handler
+            DispatchQueue.main.async {
+                // call the closure for successful location
+                onLocationFix(location.coordinate.latitude, location.coordinate.longitude)
+            }
         }
         
         manager.stopUpdatingLocation()

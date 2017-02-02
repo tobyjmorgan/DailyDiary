@@ -30,6 +30,7 @@ class PhotosViewController: UIViewController {
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var photoDisplayContainerView: UIView!
     @IBOutlet var photoDisplay: UIImageView!
+    @IBOutlet var instructionsView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -120,7 +121,17 @@ extension PhotosViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return detailItem?.photos?.count ?? 0
+        
+        let items = detailItem?.photos?.count ?? 0
+        
+        // hide the instructions if there are rows to show
+        if items > 0 {
+            instructionsView.isHidden = true
+        } else {
+            instructionsView.isHidden = false
+        }
+
+        return items
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
