@@ -14,8 +14,7 @@ extension UIViewController {
     func onDailyDiaryError(notification: Notification) {
         
         guard self.isViewLoaded && (self.view.window != nil),
-            let userInfo = notification.userInfo as? [String: Any],
-            let error = userInfo[DailyDiaryError.ErrorKey] as? DailyDiaryError else { return }
+            let error = DailyDiaryError.getErrorFromNotification(notification: notification) else { return }
         
         let alert = UIAlertController(title: error.title, message: error.message, preferredStyle: .alert)
         let action:UIAlertAction

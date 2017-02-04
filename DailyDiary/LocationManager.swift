@@ -10,21 +10,36 @@ import Foundation
 import CoreLocation
 import UIKit
 
+// to simplify unit testing
+extension CLLocationManager {
+    func authorizationStatus() -> CLAuthorizationStatus {
+        return CLLocationManager.authorizationStatus()
+    }
+}
+
 class LocationManager: NSObject {
 
-    let manager = CLLocationManager()
-    let geocoder = CLGeocoder()
+    let manager: CLLocationManager
+    let geocoder: CLGeocoder
    
     // dependency injection for presenting alerts
     let alertPresentingViewController: UIViewController
     
-    init(alertPresentingViewController: UIViewController) {
+    init(manager: CLLocationManager, geocoder: CLGeocoder, alertPresentingViewController: UIViewController) {
+        self.manager = manager
+        self.geocoder = geocoder
         self.alertPresentingViewController = alertPresentingViewController
         super.init()
         
         manager.delegate = self
     }
 
+    // split initialization so that CLLocationManager and CLGeocoder
+    // can be injected if desired (i.e. for unit testing)
+    convenience init(alertPresentingViewController: UIViewController) {
+        self.init(manager: CLLocationManager(), geocoder: CLGeocoder(), alertPresentingViewController: alertPresentingViewController)
+    }
+    
     // a closure for what to do when successfully geolocated
     internal var onLocationFix: ((Double, Double) -> Void)?
 
@@ -35,7 +50,9 @@ class LocationManager: NSObject {
         onLocationFix = completion
         
         // what permissions do we have for using CLLocationManager?
-        switch CLLocationManager.authorizationStatus() {
+        // changed CLLocationManager.authorizationStatus() to a call to my extension
+        // this makes unit testing with dependency injection easier
+        switch manager.authorizationStatus() {
         
         case .authorizedAlways:
             // not requested by this app so should never happen
@@ -100,14 +117,14 @@ class LocationManager: NSObject {
 
 extension LocationManager: CLLocationManagerDelegate {
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+    internal func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         
         if status == .authorizedWhenInUse {
             manager.startUpdatingLocation()
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    internal func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         
         // present alert with details of why geolocation failed
         let alertController = UIAlertController(
@@ -121,7 +138,7 @@ extension LocationManager: CLLocationManagerDelegate {
     }
 
     // found our location
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    internal func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         guard let location = locations.first else { return }
         

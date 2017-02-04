@@ -19,4 +19,12 @@ struct DailyDiaryError {
     func makeUserInfoDict() -> [String : Any] {
         return [DailyDiaryError.ErrorKey : DailyDiaryError(title: title, message: message, fatal: fatal)]
     }
+    
+    static func getErrorFromNotification(notification: Notification) -> DailyDiaryError? {
+    
+        guard let userInfo = notification.userInfo as? [String: Any],
+              let error = userInfo[DailyDiaryError.ErrorKey] as? DailyDiaryError else { return nil }
+        
+        return error
+    }
 }
