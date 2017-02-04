@@ -21,13 +21,7 @@ class DiaryViewController: UIViewController {
     // will handle fetching core data results
     lazy var fetchedResultsManager: DiaryFetchedResultsManager = {
         
-        let manager = DiaryFetchedResultsManager(managedObjectContext: self.dataController.managedObjectContext, tableView: self.tableView, onUpdateCell: {(cell, entry) in
-            
-            if let diaryCell = cell as? DiaryCell {
-                
-                self.configureCell(diaryCell, withEntry: entry)
-            }
-        })
+        let manager = DiaryFetchedResultsManager(managedObjectContext: self.dataController.managedObjectContext, tableView: self.tableView, onUpdateCell: self.configureCell)
         
         return manager
     }()
@@ -65,6 +59,10 @@ class DiaryViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         
+        //        tableView.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
+
+        // unselect anything that was previously selected when returning to this screen
+        // but only if not in split view mode (both sides showing)
         if self.splitViewController!.isCollapsed {
             
             if let selections = tableView.indexPathsForSelectedRows {
@@ -77,10 +75,8 @@ class DiaryViewController: UIViewController {
         
         tableView.reloadData()
 
-        
         displayWelcome()
 
-//        tableView.clearsSelectionOnViewWillAppear = self.splitViewController!.isCollapsed
         super.viewWillAppear(animated)
     }
     
@@ -145,7 +141,7 @@ extension DiaryViewController {
         // create new row
         let newDiaryEntry = DiaryEntry(context: dataController.managedObjectContext)
         
-        // set properties ans save
+        // set properties and save
         newDiaryEntry.createDate = NSDate()
         newDiaryEntry.diaryEntryText = "What happened today?"
         dataController.saveContext()
@@ -157,25 +153,25 @@ extension DiaryViewController {
     }
     
     // configure the cell to represent the information in the row
-    func configureCell(_ cell: DiaryCell, withEntry entry: DiaryEntry) {
+    func configureCell(_ cell: UITableViewCell, withEntry entry: DiaryEntry) {
         
-        cell.headingLabel!.text = (entry.createDate as Date).prettyDateStringEEEE_NTH_MMMM
-        cell.thoughtsLabel!.text = entry.diaryEntryText
-        cell.moodImageView.image = entry.imageForMood
+        guard let diaryCell = cell as? DiaryCell else { return }
+        
+        diaryCell.headingLabel!.text = (entry.createDate as Date).prettyDateStringEEEE_NTH_MMMM
+        diaryCell.thoughtsLabel!.text = entry.diaryEntryText
+        diaryCell.moodImageView.image = entry.imageForMood
         
         if let photo = entry.photos?.lastObject as? Photo, let image = UIImage(data: photo.image as Data) {
-            cell.mainImageView.image = image
+            diaryCell.mainImageView.image = image
         }
         
         if let location = entry.location {
-            
-            cell.isLocationInfoShowing = true
-            
-            locationManager.getPlacement(latitude: location.latitude, longitude: location.longitude) { (placeName) in
-                
-                cell.locationTextLabel.text = placeName
-            }
+
+            diaryCell.isLocationInfoShowing = true
+            diaryCell.setLocation(latitude: location.latitude, longitude: location.longitude)
         }
+        
+        diaryCell.layoutIfNeeded()
     }
 }
 
@@ -204,7 +200,7 @@ extension DiaryViewController: UITableViewDataSource, UITableViewDelegate {
         
         let entry = fetchedResultsManager.fetchedResultsController.object(at: indexPath)
         
-        self.configureCell(cell, withEntry: entry)
+        configureCell(cell, withEntry: entry)
         
         // ensure the cell's layout is updated
         cell.layoutIfNeeded()

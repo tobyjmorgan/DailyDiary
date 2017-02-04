@@ -90,15 +90,15 @@ class LocationManager: NSObject {
     
     // used when requesting a location be converted in to placement
     func getPlacement(latitude: Double, longitude: Double, completion: @escaping (String) -> Void) {
-        
+print("TJM getPlacement called")
         let location = CLLocation(latitude: latitude, longitude: longitude)
         
         geocoder.reverseGeocodeLocation(location) { placemarks, error in
-
+print("TJM geocoder.reverseGeocodeLocation called")
             // make sure this happens on the main queue
             // just in case there is any GUI code inside the completion handler
             DispatchQueue.main.async {
-
+print("TJM geocoder.reverseGeocodeLocation has completed and is back on the main thread")
                 guard let placemark = placemarks?.first,
                     let _ = placemark.name,
                     let city = placemark.locality,
